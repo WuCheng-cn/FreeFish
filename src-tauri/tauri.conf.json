@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "FreeFish",
+  "productName": "SysNotes",
   "version": "0.1.0",
   "identifier": "com.wu.freefish",
   "build": {
@@ -12,11 +12,11 @@
     "windows": [
       {
         "label": "main",
-        "title": "FreeFish",
+        "title": "SysNotes",
         "width": 520,
         "height": 400,
-        "minWidth": 260,
-        "minHeight": 160,
+        "minWidth": 200,
+        "minHeight": 28,
         "transparent": true,
         "decorations": false,
         "alwaysOnTop": true,

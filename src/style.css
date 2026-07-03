@@ -115,6 +115,21 @@ body.disguise #content .ln {
 body.disguise #content .cd { color: #9cdcfe; word-break: break-all; }
 body.disguise #content .cd::before { content: "// "; color: #6a9955; }
 
+/* 单行模式:整窗只显示一行,无滚动条 */
+body.linemode #readerScroll {
+  overflow: hidden !important;
+  padding: 0 12px;
+  display: flex; align-items: center;
+}
+body.linemode #readerScroll::-webkit-scrollbar { display: none; }
+body.linemode #content { width: 100%; line-height: 1.2; }
+body.linemode #content p.oneline {
+  white-space: nowrap; overflow: hidden;
+  text-indent: 0; margin: 0;
+}
+body.linemode #pageinfo { display: none; }
+#btnLine.on { color: var(--accent); background: rgba(79,156,249,.15); }
+
 /* 鼠标穿透模式:隐藏一切 UI,只留文字 */
 body.ghost #app { background: transparent !important; }
 body.ghost #titlebar, body.ghost .panel, body.ghost #pageinfo { display: none !important; }

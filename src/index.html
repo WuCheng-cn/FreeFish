@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FreeFish</title>
+  <title>SysNotes</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app">
     <!-- 顶栏(悬停显现,可拖动窗口) -->
     <div id="titlebar" data-tauri-drag-region>
-      <span id="tbTitle" data-tauri-drag-region>FreeFish</span>
+      <span id="tbTitle" data-tauri-drag-region>SysNotes</span>
       <div id="tbBtns">
         <button id="btnShelf"    title="书架">书</button>
         <button id="btnToc"      title="目录 / 章节跳转">目</button>
         <button id="btnSearch"   title="全文搜索 (Ctrl+F)">搜</button>
         <button id="btnSettings" title="设置">设</button>
         <button id="btnTop"      title="切换置顶">顶</button>
+        <button id="btnLine"     title="单行模式">行</button>
         <button id="btnGhost"    title="鼠标穿透模式">透</button>
         <button id="btnMin"      title="最小化">–</button>
         <button id="btnClose"    title="退出">×</button>
@@ -84,12 +85,14 @@
         </label>
         <label class="row"><input id="setDisguise" type="checkbox" /> 伪装模式(正文渲染成代码样式)</label>
         <label class="row"><input id="setOpenLast" type="checkbox" /> 启动时打开上次阅读的书</label>
+        <label class="row"><input id="setAutoHide" type="checkbox" /> 无操作自动隐藏(老板键唤回)</label>
+        <label class="row">无操作秒数 <input id="setAutoHideSecs" type="number" min="3" max="600" step="1" style="width:64px" /></label>
 
         <h4>章节解析</h4>
         <label>章节标题正则(改后点重新解析)
           <input id="setRegex" type="text" />
         </label>
-        <button id="btnReparse">重新解析当前书本</button>
+        <button id="btnReparse">重新解析当前书</button>
 
         <h4>全局快捷键(点击输入框后按组合键,Backspace 清空=禁用)</h4>
         <div class="sc-grid">
@@ -98,10 +101,11 @@
           <label>下一页</label><input class="sc" data-action="next" readonly />
           <label>鼠标穿透</label><input class="sc" data-action="ghost" readonly />
           <label>切换置顶</label><input class="sc" data-action="top" readonly />
+          <label>单行模式</label><input class="sc" data-action="line" readonly />
         </div>
         <button id="btnApplySc" class="primary">应用快捷键</button>
         <div id="scResult" class="muted"></div>
-        <p class="muted small">窗口聚焦时另有本地按键:←/→、PgUp/PgDn、空格翻页,↑/↓ 滚动,Esc 隐藏(用老板键唤回),Ctrl+F 搜索。</p>
+        <p class="muted small">窗口聚焦时另有本地按键:←/→、PgUp/PgDn、空格翻页,↑/↓ 滚动,Esc 隐藏(用老板键唤回),Ctrl+F 搜索。单行模式下 ←/→/↑/↓/滚轮均为逐行,点击正文也可翻行(左 1/4 上一行,其余下一行)。</p>
       </div>
     </aside>
 
