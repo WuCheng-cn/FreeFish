@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FreeFish</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 顶栏(悬停显现,可拖动窗口) -->
+    <div id="titlebar" data-tauri-drag-region>
+      <span id="tbTitle" data-tauri-drag-region>FreeFish</span>
+      <div id="tbBtns">
+        <button id="btnShelf"    title="书架">书</button>
+        <button id="btnToc"      title="目录 / 章节跳转">目</button>
+        <button id="btnSearch"   title="全文搜索 (Ctrl+F)">搜</button>
+        <button id="btnSettings" title="设置">设</button>
+        <button id="btnTop"      title="切换置顶">顶</button>
+        <button id="btnGhost"    title="鼠标穿透模式">透</button>
+        <button id="btnMin"      title="最小化">–</button>
+        <button id="btnClose"    title="退出">×</button>
+      </div>
+    </div>
+
+    <!-- 书架 -->
+    <div id="shelf" class="view">
+      <div class="shelf-head">
+        <span>书架</span>
+        <button id="btnAddBook" class="primary">+ 添加 txt</button>
+      </div>
+      <div id="shelfList"></div>
+      <div id="shelfEmpty" class="muted hidden">书架空空如也,点击「+ 添加 txt」导入本地小说</div>
+    </div>
+
+    <!-- 阅读器 -->
+    <div id="reader" class="view hidden">
+      <div id="readerScroll">
+        <div id="content"></div>
+      </div>
+      <div id="pageinfo"></div>
+    </div>
+
+    <!-- 目录面板 -->
+    <aside id="tocPanel" class="panel hidden">
+      <div class="panel-head">
+        <input id="tocFilter" type="text" placeholder="筛选章节名…" />
+        <button class="panel-close" data-close="tocPanel">×</button>
+      </div>
+      <div id="tocList" class="panel-body"></div>
+    </aside>
+
+    <!-- 搜索面板 -->
+    <aside id="searchPanel" class="panel hidden">
+      <div class="panel-head">
+        <input id="searchInput" type="text" placeholder="全文搜索,回车跳转…" />
+        <button class="panel-close" data-close="searchPanel">×</button>
+      </div>
+      <div id="searchInfo" class="muted"></div>
+      <div id="searchList" class="panel-body"></div>
+    </aside>
+
+    <!-- 设置面板 -->
+    <aside id="settingsPanel" class="panel hidden">
+      <div class="panel-head">
+        <span>设置</span>
+        <button class="panel-close" data-close="settingsPanel">×</button>
+      </div>
+      <div class="panel-body" id="settingsBody">
+        <h4>外观</h4>
+        <label>字体
+          <input id="setFont" type="text" placeholder="如: 微软雅黑" />
+        </label>
+        <label>字号 <span id="valFontSize"></span>
+          <input id="setFontSize" type="range" min="10" max="30" step="1" />
+        </label>
+        <label>行距 <span id="valLineHeight"></span>
+          <input id="setLineHeight" type="range" min="1.2" max="2.6" step="0.1" />
+        </label>
+        <label class="row">文字颜色 <input id="setTextColor" type="color" /></label>
+        <label class="row">背景颜色 <input id="setBgColor" type="color" /></label>
+        <label>背景不透明度 <span id="valBgOpacity"></span>%
+          <input id="setBgOpacity" type="range" min="0" max="100" step="1" />
+        </label>
+        <label class="row"><input id="setDisguise" type="checkbox" /> 伪装模式(正文渲染成代码样式)</label>
+        <label class="row"><input id="setOpenLast" type="checkbox" /> 启动时打开上次阅读的书</label>
+
+        <h4>章节解析</h4>
+        <label>章节标题正则(改后点重新解析)
+          <input id="setRegex" type="text" />
+        </label>
+        <button id="btnReparse">重新解析当前书</button>
+
+        <h4>全局快捷键(点击输入框后按组合键,Backspace 清空=禁用)</h4>
+        <div class="sc-grid">
+          <label>老板键(显/隐)</label><input class="sc" data-action="boss" readonly />
+          <label>上一页</label><input class="sc" data-action="prev" readonly />
+          <label>下一页</label><input class="sc" data-action="next" readonly />
+          <label>鼠标穿透</label><input class="sc" data-action="ghost" readonly />
+          <label>切换置顶</label><input class="sc" data-action="top" readonly />
+        </div>
+        <button id="btnApplySc" class="primary">应用快捷键</button>
+        <div id="scResult" class="muted"></div>
+        <p class="muted small">窗口聚焦时另有本地按键:←/→、PgUp/PgDn、空格翻页,↑/↓ 滚动,Esc 隐藏(用老板键唤回),Ctrl+F 搜索。</p>
+      </div>
+    </aside>
+
+    <div id="toast" class="hidden"></div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
