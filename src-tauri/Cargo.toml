@@ -1,6 +1,6 @@
 [package]
 name = "freefish"
-version = "0.1.0"
+version = "0.1.1"
 description = "FreeFish - 摸鱼悬浮 txt 阅读器"
 edition = "2021"
 
