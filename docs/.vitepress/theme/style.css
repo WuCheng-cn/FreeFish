@@ -5,183 +5,276 @@
   --vp-c-brand-soft: rgba(79, 156, 249, 0.14);
   --vp-font-family-base: Aptos, "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
   --vp-font-family-mono: Consolas, "SFMono-Regular", monospace;
+  --fish-card: #f3f4f6;
+  --fish-card-icon: #e7e9ed;
 }
 
 .dark {
-  --vp-c-bg: #111318;
-  --vp-c-bg-alt: #16181d;
-  --vp-c-bg-soft: #1c1e24;
-  --vp-c-bg-elv: #23262e;
-  --vp-c-text-1: #d9dce3;
-  --vp-c-text-2: #aeb3be;
-  --vp-c-divider: rgba(255, 255, 255, 0.09);
+  --vp-c-bg: #1b1b1f;
+  --vp-c-bg-alt: #202127;
+  --vp-c-bg-soft: #242428;
+  --vp-c-bg-elv: #2b2b30;
+  --vp-c-text-1: #f2f3f5;
+  --vp-c-text-2: #a8a8b0;
+  --vp-c-divider: rgba(255, 255, 255, 0.08);
   --vp-c-brand-1: #66adff;
   --vp-c-brand-2: #4f9cf9;
   --vp-c-brand-3: #3187ea;
+  --fish-card: #242428;
+  --fish-card-icon: #1b1b1f;
 }
 
 .VPNavBarTitle .logo {
-  border-radius: 8px;
+  border-radius: 7px;
 }
 
-.fish-hero {
-  max-width: 1040px;
+.VPHome {
+  margin-bottom: 72px !important;
+}
+
+.landing {
+  width: 100%;
+  max-width: 1152px;
   margin: 0 auto;
-  padding: 96px 24px 72px;
+  padding: 72px 24px 0;
 }
 
-.fish-hero h1 {
-  max-width: 900px;
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  align-items: center;
+  min-height: 360px;
+  gap: 48px;
+  padding-bottom: 64px;
+}
+
+.hero-brand {
+  width: fit-content;
+  margin: 0 0 8px !important;
+  background: linear-gradient(110deg, #55a5ff 16%, #8871ff 62%, #b755ff);
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(2.8rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.landing-hero h1 {
+  max-width: 680px;
   margin: 0;
-  font-size: clamp(3rem, 8vw, 6.5rem);
-  font-weight: 750;
-  letter-spacing: -0.055em;
-  line-height: 0.92;
+  border: 0;
+  color: var(--vp-c-text-1);
+  font-size: clamp(2.4rem, 4.7vw, 3.7rem);
+  font-weight: 760;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
 }
 
-html[lang="zh-CN"] .fish-hero h1 {
-  white-space: nowrap;
-}
-
-.fish-hero > p {
-  max-width: 650px;
-  margin: 28px 0 0;
+.hero-tagline {
+  max-width: 640px;
+  margin: 18px 0 0 !important;
   color: var(--vp-c-text-2);
-  font-size: clamp(1.05rem, 2vw, 1.3rem);
-  line-height: 1.7;
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
+  line-height: 1.65;
 }
 
-.fish-actions {
+.hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 30px;
 }
 
-.fish-actions a {
+.hero-actions a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   padding: 0 20px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 7px;
+  border-radius: 999px;
+  background: var(--vp-c-bg-soft);
   color: var(--vp-c-text-1);
   font-weight: 650;
   text-decoration: none;
+  transition: border-color 160ms ease, background-color 160ms ease;
 }
 
-.fish-actions a:first-child {
-  border-color: var(--vp-c-brand-2);
-  background: var(--vp-c-brand-2);
+.hero-actions a.primary {
+  border-color: #5b70f5;
+  background: #5b70f5;
   color: #fff;
 }
 
-.fish-actions a:hover,
-.fish-actions a:focus-visible {
+.hero-actions a:hover,
+.hero-actions a:focus-visible {
   border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
 }
 
-.reader-strip {
-  position: relative;
-  margin: 76px 0 64px;
-  padding: 18px 56px 18px 22px;
-  overflow: hidden;
-  border: 1px solid rgba(79, 156, 249, 0.35);
-  border-radius: 10px;
-  background: rgba(22, 24, 29, 0.94);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
-  color: #c8ccd4;
-  font-family: Consolas, "Microsoft YaHei UI", monospace;
-  line-height: 1.75;
+.hero-actions a.primary:hover,
+.hero-actions a.primary:focus-visible {
+  border-color: #7183ff;
+  background: #7183ff;
 }
 
-.reader-strip::after {
-  content: "SysNotes";
-  position: absolute;
-  top: 7px;
-  right: 12px;
-  color: rgba(255, 255, 255, 0.28);
-  font: 11px Aptos, system-ui, sans-serif;
-  letter-spacing: 0.06em;
+.platform-note {
+  margin: 18px 0 0 !important;
+  color: var(--vp-c-text-3);
+  font-size: 0.86rem;
 }
 
-.reader-strip span {
-  color: #6a9955;
-}
-
-.fish-facts {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin: 0;
-  border-top: 1px solid var(--vp-c-divider);
-  border-bottom: 1px solid var(--vp-c-divider);
-}
-
-.fish-facts div {
-  padding: 28px 28px 28px 0;
-}
-
-.fish-facts div + div {
-  padding-left: 28px;
-  border-left: 1px solid var(--vp-c-divider);
-}
-
-.fish-facts dt {
-  color: var(--vp-c-text-1);
-  font-size: 1.05rem;
+.platform-note span {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
   font-weight: 700;
 }
 
-.fish-facts dd {
-  margin: 8px 0 0;
+.fish-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 340px;
+  isolation: isolate;
+}
+
+.fish-glow {
+  position: absolute;
+  z-index: -1;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 38%, rgba(65, 184, 255, 0.62), transparent 48%),
+    radial-gradient(circle at 68% 68%, rgba(139, 92, 246, 0.58), transparent 52%);
+  filter: blur(22px);
+  opacity: 0.78;
+}
+
+.fish-stage img {
+  width: min(230px, 65%);
+  margin: 0;
+  border-radius: 25%;
+  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.28);
+  transform: rotate(-3deg);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.feature-card {
+  min-height: 190px;
+  padding: 24px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: var(--fish-card);
+}
+
+.feature-card:hover {
+  border-color: var(--vp-c-divider);
+}
+
+.feature-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--fish-card-icon);
+  font-size: 1.35rem;
+}
+
+.feature-card h2 {
+  margin: 20px 0 0;
+  border: 0;
+  color: var(--vp-c-text-1);
+  font-size: 1.05rem;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.feature-card p {
+  margin: 10px 0 0;
   color: var(--vp-c-text-2);
+  font-size: 0.94rem;
   line-height: 1.65;
 }
 
-.quick-note {
-  margin-top: 40px;
-  color: var(--vp-c-text-2);
+@media (max-width: 900px) {
+  .landing-hero {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 24px;
+  }
+
+  .fish-stage {
+    min-height: 280px;
+  }
+
+  .fish-glow {
+    width: 280px;
+    height: 280px;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-@media (max-width: 720px) {
-  .fish-hero {
-    padding: 72px 20px 48px;
+@media (max-width: 640px) {
+  .landing {
+    padding: 52px 20px 0;
   }
 
-  .fish-hero h1 {
-    font-size: clamp(3rem, 15vw, 4.8rem);
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-bottom: 48px;
   }
 
-  html[lang="zh-CN"] .fish-hero h1 {
-    white-space: normal;
+  .hero-brand {
+    font-size: 2.7rem;
   }
 
-  .reader-strip {
-    margin: 52px 0 44px;
+  .landing-hero h1 {
+    font-size: 2.45rem;
   }
 
-  .fish-facts {
+  .fish-stage {
+    min-height: 220px;
+  }
+
+  .fish-glow {
+    width: 230px;
+    height: 230px;
+  }
+
+  .fish-stage img {
+    width: 150px;
+  }
+
+  .feature-grid {
     grid-template-columns: 1fr;
   }
 
-  .fish-facts div,
-  .fish-facts div + div {
-    padding: 22px 0;
-    border-left: 0;
-  }
-
-  .fish-facts div + div {
-    border-top: 1px solid var(--vp-c-divider);
+  .feature-card {
+    min-height: 0;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .reader-strip {
-    animation: settle 500ms ease-out both;
+  .fish-stage img {
+    animation: float-in 620ms ease-out both;
   }
 }
 
-@keyframes settle {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes float-in {
+  from { opacity: 0; transform: translateY(12px) rotate(-3deg); }
+  to { opacity: 1; transform: translateY(0) rotate(-3deg); }
 }
