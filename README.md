@@ -1,6 +1,13 @@
 # FreeFish 摸鱼阅读器
 
+[English](./README.en.md) | 简体中文
+
+[![下载最新版](https://img.shields.io/github/v/release/WuCheng-cn/FreeFish?label=%E4%B8%8B%E8%BD%BD%E6%9C%80%E6%96%B0%E7%89%88&color=4f9cf9)](https://github.com/WuCheng-cn/FreeFish/releases/latest)
+[![在线文档](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E6%96%87%E6%A1%A3-FreeFish-4f9cf9)](https://wucheng-cn.github.io/FreeFish/)
+
 跨平台(Windows / macOS / Linux)悬浮桌面 txt 阅读器,基于 Tauri 2,包体小、内存低、进程不显眼(进程与窗口伪装为 SysNotes)。
+
+> **想直接使用？** 前往 [GitHub Releases](https://github.com/WuCheng-cn/FreeFish/releases/latest) 下载对应平台的最新安装包，无需安装 Node.js 或 Rust。安装与使用说明见 [在线文档](https://wucheng-cn.github.io/FreeFish/)。
 
 ## 功能
 
@@ -49,7 +56,7 @@ npm run dev      # 开发运行(首次编译约 5-10 分钟,之后增量很快)
 npm run build    # 打包安装程序,产物在 src-tauri/target/release/bundle/
 ```
 
-也可推送到 GitHub 后在 Actions 手动触发 build 工作流,自动产出三平台安装包。
+维护者推送与应用版本一致的 `v*` 标签后，GitHub Actions 会自动创建 Release，并上传 Windows、macOS 和 Linux 安装包。
 
 ## 常见问题
 

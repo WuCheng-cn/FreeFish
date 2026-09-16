@@ -1,0 +1,187 @@
+:root {
+  --vp-c-brand-1: #347fd8;
+  --vp-c-brand-2: #256dbf;
+  --vp-c-brand-3: #1f5fa8;
+  --vp-c-brand-soft: rgba(79, 156, 249, 0.14);
+  --vp-font-family-base: Aptos, "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+  --vp-font-family-mono: Consolas, "SFMono-Regular", monospace;
+}
+
+.dark {
+  --vp-c-bg: #111318;
+  --vp-c-bg-alt: #16181d;
+  --vp-c-bg-soft: #1c1e24;
+  --vp-c-bg-elv: #23262e;
+  --vp-c-text-1: #d9dce3;
+  --vp-c-text-2: #aeb3be;
+  --vp-c-divider: rgba(255, 255, 255, 0.09);
+  --vp-c-brand-1: #66adff;
+  --vp-c-brand-2: #4f9cf9;
+  --vp-c-brand-3: #3187ea;
+}
+
+.VPNavBarTitle .logo {
+  border-radius: 8px;
+}
+
+.fish-hero {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 96px 24px 72px;
+}
+
+.fish-hero h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 750;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+}
+
+html[lang="zh-CN"] .fish-hero h1 {
+  white-space: nowrap;
+}
+
+.fish-hero > p {
+  max-width: 650px;
+  margin: 28px 0 0;
+  color: var(--vp-c-text-2);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.7;
+}
+
+.fish-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.fish-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 7px;
+  color: var(--vp-c-text-1);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.fish-actions a:first-child {
+  border-color: var(--vp-c-brand-2);
+  background: var(--vp-c-brand-2);
+  color: #fff;
+}
+
+.fish-actions a:hover,
+.fish-actions a:focus-visible {
+  border-color: var(--vp-c-brand-1);
+}
+
+.reader-strip {
+  position: relative;
+  margin: 76px 0 64px;
+  padding: 18px 56px 18px 22px;
+  overflow: hidden;
+  border: 1px solid rgba(79, 156, 249, 0.35);
+  border-radius: 10px;
+  background: rgba(22, 24, 29, 0.94);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+  color: #c8ccd4;
+  font-family: Consolas, "Microsoft YaHei UI", monospace;
+  line-height: 1.75;
+}
+
+.reader-strip::after {
+  content: "SysNotes";
+  position: absolute;
+  top: 7px;
+  right: 12px;
+  color: rgba(255, 255, 255, 0.28);
+  font: 11px Aptos, system-ui, sans-serif;
+  letter-spacing: 0.06em;
+}
+
+.reader-strip span {
+  color: #6a9955;
+}
+
+.fish-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  border-top: 1px solid var(--vp-c-divider);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.fish-facts div {
+  padding: 28px 28px 28px 0;
+}
+
+.fish-facts div + div {
+  padding-left: 28px;
+  border-left: 1px solid var(--vp-c-divider);
+}
+
+.fish-facts dt {
+  color: var(--vp-c-text-1);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.fish-facts dd {
+  margin: 8px 0 0;
+  color: var(--vp-c-text-2);
+  line-height: 1.65;
+}
+
+.quick-note {
+  margin-top: 40px;
+  color: var(--vp-c-text-2);
+}
+
+@media (max-width: 720px) {
+  .fish-hero {
+    padding: 72px 20px 48px;
+  }
+
+  .fish-hero h1 {
+    font-size: clamp(3rem, 15vw, 4.8rem);
+  }
+
+  html[lang="zh-CN"] .fish-hero h1 {
+    white-space: normal;
+  }
+
+  .reader-strip {
+    margin: 52px 0 44px;
+  }
+
+  .fish-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .fish-facts div,
+  .fish-facts div + div {
+    padding: 22px 0;
+    border-left: 0;
+  }
+
+  .fish-facts div + div {
+    border-top: 1px solid var(--vp-c-divider);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reader-strip {
+    animation: settle 500ms ease-out both;
+  }
+}
+
+@keyframes settle {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
