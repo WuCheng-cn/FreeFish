@@ -15,27 +15,11 @@ export default defineConfig({
       label: '简体中文',
       lang: 'zh-CN',
       title: 'FreeFish',
-      description: '轻量、隐蔽的跨平台悬浮 TXT 阅读器'
-    },
-    en: {
-      label: 'English',
-      lang: 'en-US',
-      link: '/en/',
-      title: 'FreeFish',
-      description: 'A lightweight, discreet floating TXT reader'
-    }
-  },
-  themeConfig: {
-    logo: '/logo.svg',
-    socialLinks: [{ icon: 'github', link: repo }],
-    search: { provider: 'local' },
-    locales: {
-      root: {
-        label: '简体中文',
+      description: '轻量、隐蔽的跨平台悬浮 TXT 阅读器',
+      themeConfig: {
         nav: [
           { text: '指南', link: '/guide/getting-started' },
-          { text: '下载', link: '/download' },
-          { text: 'GitHub', link: repo }
+          { text: '下载', link: '/download' }
         ],
         sidebar: {
           '/guide/': [
@@ -54,13 +38,18 @@ export default defineConfig({
         returnToTopLabel: '回到顶部',
         sidebarMenuLabel: '目录',
         darkModeSwitchLabel: '外观'
-      },
-      en: {
-        label: 'English',
+      }
+    },
+    en: {
+      label: 'English',
+      lang: 'en-US',
+      link: '/en/',
+      title: 'FreeFish',
+      description: 'A lightweight, discreet floating TXT reader',
+      themeConfig: {
         nav: [
           { text: 'Guide', link: '/en/guide/getting-started' },
-          { text: 'Download', link: '/en/download' },
-          { text: 'GitHub', link: repo }
+          { text: 'Download', link: '/en/download' }
         ],
         sidebar: {
           '/en/guide/': [
@@ -74,7 +63,12 @@ export default defineConfig({
           ]
         }
       }
-    },
+    }
+  },
+  themeConfig: {
+    logo: '/logo.svg',
+    socialLinks: [{ icon: 'github', link: repo }],
+    search: { provider: 'local' },
     editLink: {
       pattern: `${repo}/edit/master/docs/:path`,
       text: '在 GitHub 上编辑此页'
