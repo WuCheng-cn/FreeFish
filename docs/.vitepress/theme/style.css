@@ -49,8 +49,10 @@
 }
 
 .hero-brand {
+  display: inline-block;
   width: fit-content;
-  margin: 0 0 8px !important;
+  margin: -0.08em 0 calc(8px - 0.08em) !important;
+  padding-block: 0.08em;
   background: linear-gradient(110deg, #55a5ff 16%, #8871ff 62%, #b755ff);
   background-clip: text;
   color: transparent;
