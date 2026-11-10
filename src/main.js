@@ -40,6 +40,7 @@ let settings = {
 let shelf = [];      // [{id, path, title, progress:{ch, ratio}}]
 let book = null;     // {meta, text, chapters:[{title,start,end}], ch}
 let ghost = false;
+let ghostChanging = false;
 let searchResults = [];
 let segStart = 0, segEnd = 0; // 单行模式:当前行在本章内的字符区间
 
@@ -569,11 +570,22 @@ function handleHotkey(action) {
 }
 
 async function toggleGhost() {
-  ghost = !ghost;
-  document.body.classList.toggle("ghost", ghost);
-  try { await appWindow.setIgnoreCursorEvents(ghost); } catch (e) { console.error(e); }
-  if (ghost) toast(`鼠标穿透已开启,按 ${settings.shortcuts.ghost || "快捷键"} 退出`, 3500);
-  else toast("鼠标穿透已关闭");
+  if (ghostChanging) return;
+  ghostChanging = true;
+  const nextGhost = !ghost;
+  try {
+    // 原生端统一更新任务栏图标与鼠标穿透,并在老板键唤回时保持图标隐藏。
+    await invoke("set_ghost_mode", { enabled: nextGhost });
+    ghost = nextGhost;
+    document.body.classList.toggle("ghost", ghost);
+    if (ghost) toast(`鼠标穿透已开启,按 ${settings.shortcuts.ghost || "快捷键"} 退出`, 3500);
+    else toast("鼠标穿透已关闭");
+  } catch (e) {
+    console.error(e);
+    toast("鼠标穿透切换失败,请重试", 3500);
+  } finally {
+    ghostChanging = false;
+  }
 }
 
 async function toggleTop() {

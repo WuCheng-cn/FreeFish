@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -12,6 +13,30 @@ const WINDOW_STATE_FLAGS: StateFlags = StateFlags::POSITION
 /// 已注册快捷键 -> 动作名 的映射
 #[derive(Default)]
 struct ShortcutMap(Mutex<HashMap<Shortcut, String>>);
+
+#[derive(Default)]
+struct GhostMode(AtomicBool);
+
+#[tauri::command]
+fn set_ghost_mode(app: AppHandle, enabled: bool) -> Result<(), String> {
+    let win = app.get_webview_window("main").ok_or("阅读窗口不存在")?;
+    let state = app.state::<GhostMode>();
+    let previous = state.0.load(Ordering::Relaxed);
+    let result = win
+        .set_skip_taskbar(enabled)
+        .and_then(|_| win.set_ignore_cursor_events(enabled));
+    if let Err(error) = result {
+        if let Err(rollback_error) = win.set_ignore_cursor_events(previous) {
+            eprintln!("恢复鼠标穿透状态失败: {rollback_error}");
+        }
+        if let Err(rollback_error) = win.set_skip_taskbar(previous) {
+            eprintln!("恢复任务栏图标失败: {rollback_error}");
+        }
+        return Err(error.to_string());
+    }
+    state.0.store(enabled, Ordering::Relaxed);
+    Ok(())
+}
 
 /// 读取 txt 并自动检测编码(UTF-8/UTF-16 BOM、GBK/GB18030/Big5 等)
 #[tauri::command]
@@ -157,6 +182,12 @@ fn toggle_boss(app: &AppHandle) {
                 eprintln!("隐藏窗口失败: {error}");
             }
         } else if win.show().is_ok() {
+            // Windows 重新显示窗口时可能重新添加任务栏按钮。
+            if app.state::<GhostMode>().0.load(Ordering::Relaxed) {
+                if let Err(error) = win.set_skip_taskbar(true) {
+                    eprintln!("隐藏任务栏图标失败: {error}");
+                }
+            }
             sync_shortcuts(app, true);
             let _ = win.set_focus();
         }
@@ -199,6 +230,7 @@ pub fn run() {
                 .build(),
         )
         .manage(ShortcutMap::default())
+        .manage(GhostMode::default())
         .setup(|app| {
             if let Some(win) = app.get_webview_window("main") {
                 // 先恢复位置和尺寸再显示,避免启动时闪现默认窗口。
@@ -225,7 +257,8 @@ pub fn run() {
             save_data,
             load_data,
             set_shortcuts,
-            hide_reader
+            hide_reader,
+            set_ghost_mode
         ])
         .run(tauri::generate_context!())
         .expect("error while running FreeFish");
