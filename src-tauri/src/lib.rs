@@ -1,12 +1,42 @@
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 
 use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
+use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
+
+const WINDOW_STATE_FLAGS: StateFlags = StateFlags::POSITION
+    .union(StateFlags::SIZE)
+    .union(StateFlags::MAXIMIZED);
 
 /// 已注册快捷键 -> 动作名 的映射
 #[derive(Default)]
 struct ShortcutMap(Mutex<HashMap<Shortcut, String>>);
+
+#[derive(Default)]
+struct GhostMode(AtomicBool);
+
+#[tauri::command]
+fn set_ghost_mode(app: AppHandle, enabled: bool) -> Result<(), String> {
+    let win = app.get_webview_window("main").ok_or("阅读窗口不存在")?;
+    let state = app.state::<GhostMode>();
+    let previous = state.0.load(Ordering::Relaxed);
+    let result = win
+        .set_skip_taskbar(enabled)
+        .and_then(|_| win.set_ignore_cursor_events(enabled));
+    if let Err(error) = result {
+        if let Err(rollback_error) = win.set_ignore_cursor_events(previous) {
+            eprintln!("恢复鼠标穿透状态失败: {rollback_error}");
+        }
+        if let Err(rollback_error) = win.set_skip_taskbar(previous) {
+            eprintln!("恢复任务栏图标失败: {rollback_error}");
+        }
+        return Err(error.to_string());
+    }
+    state.0.store(enabled, Ordering::Relaxed);
+    Ok(())
+}
 
 /// 读取 txt 并自动检测编码(UTF-8/UTF-16 BOM、GBK/GB18030/Big5 等)
 #[tauri::command]
@@ -81,6 +111,9 @@ fn set_shortcuts(
     map.clear();
 
     let mut results = HashMap::new();
+    let visible = app
+        .get_webview_window("main")
+        .is_some_and(|win| win.is_visible().unwrap_or(false));
     for (action, acc) in bindings {
         let acc = acc.trim().to_string();
         if acc.is_empty() {
@@ -88,7 +121,11 @@ fn set_shortcuts(
             continue;
         }
         match acc.parse::<Shortcut>() {
-            Ok(sc) => match gs.register(sc) {
+            Ok(sc) => match if action == "boss" || visible {
+                gs.register(sc)
+            } else {
+                Ok(())
+            } {
                 Ok(()) => {
                     map.insert(sc, action.clone());
                     results.insert(action, "ok".to_string());
@@ -105,13 +142,53 @@ fn set_shortcuts(
     results
 }
 
+/// 隐藏时释放非老板键,唤回后恢复；不要持有映射锁调用系统快捷键 API。
+fn sync_shortcuts(app: &AppHandle, visible: bool) {
+    let shortcuts = app.state::<ShortcutMap>().0.lock().unwrap().clone();
+    let gs = app.global_shortcut();
+    for (shortcut, action) in shortcuts {
+        if action == "boss" {
+            continue;
+        }
+        let result = if visible && !gs.is_registered(shortcut) {
+            gs.register(shortcut)
+        } else if !visible && gs.is_registered(shortcut) {
+            gs.unregister(shortcut)
+        } else {
+            continue;
+        };
+        if let Err(error) = result {
+            let message = format!("快捷键 {action} 更新失败: {error}");
+            eprintln!("{message}");
+            let _ = app.emit("shortcut-error", message);
+        }
+    }
+}
+
+#[tauri::command]
+fn hide_reader(app: AppHandle) -> Result<(), String> {
+    if let Some(win) = app.get_webview_window("main") {
+        win.hide().map_err(|error| error.to_string())?;
+        sync_shortcuts(&app, false);
+    }
+    Ok(())
+}
+
 /// 老板键: 直接在 Rust 侧切换窗口显示/隐藏,窗口隐藏时 JS 不可达也依然有效
 fn toggle_boss(app: &AppHandle) {
     if let Some(win) = app.get_webview_window("main") {
         if win.is_visible().unwrap_or(false) {
-            let _ = win.hide();
-        } else {
-            let _ = win.show();
+            if let Err(error) = hide_reader(app.clone()) {
+                eprintln!("隐藏窗口失败: {error}");
+            }
+        } else if win.show().is_ok() {
+            // Windows 重新显示窗口时可能重新添加任务栏按钮。
+            if app.state::<GhostMode>().0.load(Ordering::Relaxed) {
+                if let Err(error) = win.set_skip_taskbar(true) {
+                    eprintln!("隐藏任务栏图标失败: {error}");
+                }
+            }
+            sync_shortcuts(app, true);
             let _ = win.set_focus();
         }
     }
@@ -123,10 +200,8 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_window_state::Builder::default()
-                .with_state_flags(
-                    tauri_plugin_window_state::StateFlags::POSITION
-                        | tauri_plugin_window_state::StateFlags::SIZE,
-                )
+                .with_state_flags(WINDOW_STATE_FLAGS)
+                .skip_initial_state("main")
                 .build(),
         )
         .plugin(
@@ -143,7 +218,10 @@ pub fn run() {
                     if let Some(action) = action {
                         if action == "boss" {
                             toggle_boss(app);
-                        } else {
+                        } else if app
+                            .get_webview_window("main")
+                            .is_some_and(|win| win.is_visible().unwrap_or(false))
+                        {
                             // 其余动作(翻页/穿透/置顶)交给前端处理
                             let _ = app.emit("hotkey", action);
                         }
@@ -152,12 +230,35 @@ pub fn run() {
                 .build(),
         )
         .manage(ShortcutMap::default())
+        .manage(GhostMode::default())
+        .setup(|app| {
+            if let Some(win) = app.get_webview_window("main") {
+                // 先恢复位置和尺寸再显示,避免启动时闪现默认窗口。
+                if let Err(error) = win.restore_state(WINDOW_STATE_FLAGS) {
+                    eprintln!("恢复窗口状态失败: {error}");
+                }
+                win.show()?;
+            }
+            Ok(())
+        })
+        .on_window_event(|window, event| {
+            if window.label() == "main"
+                && matches!(event, tauri::WindowEvent::CloseRequested { .. })
+            {
+                // 在窗口销毁前落盘;不保存隐藏状态,下次启动仍可直接看到窗口。
+                if let Err(error) = window.app_handle().save_window_state(WINDOW_STATE_FLAGS) {
+                    eprintln!("保存窗口状态失败: {error}");
+                }
+            }
+        })
         .invoke_handler(tauri::generate_handler![
             read_book,
             pick_txt,
             save_data,
             load_data,
-            set_shortcuts
+            set_shortcuts,
+            hide_reader,
+            set_ghost_mode
         ])
         .run(tauri::generate_context!())
         .expect("error while running FreeFish");

@@ -40,6 +40,7 @@ let settings = {
 let shelf = [];      // [{id, path, title, progress:{ch, ratio}}]
 let book = null;     // {meta, text, chapters:[{title,start,end}], ch}
 let ghost = false;
+let ghostChanging = false;
 let searchResults = [];
 let segStart = 0, segEnd = 0; // 单行模式:当前行在本章内的字符区间
 
@@ -553,7 +554,7 @@ function resetIdleTimer() {
   clearTimeout(idleTimer);
   if (!settings.autoHide) return;
   idleTimer = setTimeout(async () => {
-    try { await appWindow.hide(); } catch (e) { console.error(e); }
+    try { await invoke("hide_reader"); } catch (e) { console.error(e); }
   }, Math.max(3, +settings.autoHideSecs || 10) * 1000);
 }
 
@@ -569,11 +570,22 @@ function handleHotkey(action) {
 }
 
 async function toggleGhost() {
-  ghost = !ghost;
-  document.body.classList.toggle("ghost", ghost);
-  try { await appWindow.setIgnoreCursorEvents(ghost); } catch (e) { console.error(e); }
-  if (ghost) toast(`鼠标穿透已开启,按 ${settings.shortcuts.ghost || "快捷键"} 退出`, 3500);
-  else toast("鼠标穿透已关闭");
+  if (ghostChanging) return;
+  ghostChanging = true;
+  const nextGhost = !ghost;
+  try {
+    // 原生端统一更新任务栏图标与鼠标穿透,并在老板键唤回时保持图标隐藏。
+    await invoke("set_ghost_mode", { enabled: nextGhost });
+    ghost = nextGhost;
+    document.body.classList.toggle("ghost", ghost);
+    if (ghost) toast(`鼠标穿透已开启,按 ${settings.shortcuts.ghost || "快捷键"} 退出`, 3500);
+    else toast("鼠标穿透已关闭");
+  } catch (e) {
+    console.error(e);
+    toast("鼠标穿透切换失败,请重试", 3500);
+  } finally {
+    ghostChanging = false;
+  }
 }
 
 async function toggleTop() {
@@ -723,7 +735,7 @@ function bindUI() {
     if (e.key === "Escape") {
       const open = document.querySelector(".panel:not(.hidden)");
       if (open) closePanels();
-      else appWindow.hide(); // 本地老板键,全局老板键唤回
+      else invoke("hide_reader").catch(console.error); // 本地老板键,全局老板键唤回
       e.preventDefault();
       return;
     }
@@ -745,12 +757,15 @@ function bindUI() {
   scrollEl().addEventListener("scroll", () => { updatePageInfo(); saveProgressSoon(); });
   window.addEventListener("blur", () => { if (book) saveProgressSoon(); });
 
-  // 单行模式:滚轮逐行,窗口宽度变化时重排当前行
-  scrollEl().addEventListener("wheel", (e) => {
-    if (!settings.lineMode || !book) return;
+  // 鼠标悬停在阅读窗口时滚轮翻页;面板和表单保留原生滚动。
+  $("app").addEventListener("wheel", (e) => {
+    if (!book || $("reader").classList.contains("hidden") || ghost) return;
+    if (e.target.closest(".panel, input, textarea, select, [contenteditable]")) return;
+    if (e.ctrlKey || e.metaKey || e.deltaY === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     e.preventDefault();
-    e.deltaY > 0 ? lineNext() : linePrev();
+    pageTurn(e.deltaY > 0 ? 1 : -1);
   }, { passive: false });
+  // 单行模式:窗口宽度变化时重排当前行
   window.addEventListener("resize", debounce(() => {
     if (settings.lineMode && book) renderLine(segStart);
   }, 150));
@@ -790,6 +805,7 @@ async function init() {
   try { await appWindow.setAlwaysOnTop(!!settings.alwaysOnTop); } catch (e) { console.error(e); }
 
   await listen("hotkey", (e) => handleHotkey(e.payload));
+  await listen("shortcut-error", (e) => toast(e.payload, 5000));
   await applyShortcuts(false);
   resetIdleTimer();
 

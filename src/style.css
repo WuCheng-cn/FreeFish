@@ -4,7 +4,6 @@
   --lh: 1.8;
   --fg: #c8ccd4;
   --bg: rgba(22, 24, 29, 0.92);
-  --panel-bg: rgba(28, 30, 36, 0.97);
   --accent: #4f9cf9;
 }
 
@@ -133,13 +132,12 @@ body.linemode #pageinfo { display: none; }
 /* 鼠标穿透模式:隐藏一切 UI,只留文字 */
 body.ghost #app { background: transparent !important; }
 body.ghost #titlebar, body.ghost .panel, body.ghost #pageinfo { display: none !important; }
-body.ghost #content { text-shadow: 0 0 3px rgba(0,0,0,.9); }
 
 /* ---------- 面板 ---------- */
 .panel {
   position: absolute; top: 30px; right: 0; bottom: 0;
   width: min(320px, 92%);
-  background: var(--panel-bg);
+  background: var(--bg);
   border-left: 1px solid rgba(255,255,255,.08);
   z-index: 40;
   display: flex; flex-direction: column;
@@ -157,10 +155,11 @@ body.ghost #content { text-shadow: 0 0 3px rgba(0,0,0,.9); }
   border-radius: 4px; color: var(--fg); padding: 4px 8px; font-size: 13px;
 }
 .panel-close {
-  border: none; background: transparent; color: rgba(255,255,255,.5);
+  border: none; background: transparent; color: inherit;
   font-size: 16px; cursor: pointer; margin-left: auto;
 }
 .panel-body { flex: 1; overflow-y: auto; padding: 6px 0; }
+.panel .muted { color: inherit; }
 .panel-body::-webkit-scrollbar { width: 5px; }
 .panel-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); }
 
@@ -180,7 +179,7 @@ body.ghost #content { text-shadow: 0 0 3px rgba(0,0,0,.9); }
 
 /* 设置 */
 #settingsBody { padding: 10px 14px; }
-#settingsBody h4 { margin: 12px 0 8px; font-size: 12px; color: rgba(255,255,255,.5); }
+#settingsBody h4 { margin: 12px 0 8px; font-size: 12px; color: inherit; }
 #settingsBody h4:first-child { margin-top: 0; }
 #settingsBody label { display: block; margin-bottom: 8px; }
 #settingsBody label.row { display: flex; align-items: center; gap: 8px; }
